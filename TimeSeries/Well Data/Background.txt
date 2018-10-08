@@ -1,0 +1,42 @@
+The analysis to be done in this class is only a small part of a bigger project with the National Science Foundation and US Department of Agriculture's program on Water, Sustainability, and Climate (WSC).  We will be responsible for creating time series models for the level of water (in feet) in various wells in Florida.  Each group will be given a well in which they are responsible for modeling.  For time series I, we will only focus on the data from the "Well" sheet (this contains the level of the water in the well measured in feet).  In time series II, we will move onto including information from the "Tide" and "Rain" sheets (fairly self explanatory; all measurements are in feet).  For some of the wells, the tidal information is contained in a separate file.
+
+The information below provides the well and its location (see attachment for picture of location).  Be sure to use the information below about the correct start and stop date (there is a chance you will not use the entire range of data).  The data should be hourly (need to check to make sure that all the data are recorded hourly).  The column that contains the actual series is the column titled "Corrected", this is the column with the correct data (i.e. use THIS data when doing analysis).  When sending in reports, you need to include two files: (1) the report and (2) the code used to create the analysis in the report.  Every time your code is included in the report, it should include how to get the raw data all the way to the analysis (i.e. if there are any transformations and/or imputations, they need to ALWAYS be included!!).  The last report, including the code used for the last report, for time series I will be sent to the group using that well in time series II (so they do NOT have to start from scratch!).
+
+All reports from time series II will be sent to our contact down in Florida and will be included in future analyses.  Be sure your code is easy to read and interpret.
+
+O1, B1, O2, B2, O11  -  Castellanos, Stanford, Sears, Saunders, Walsh    G-3549 This well is close to Miami (see Figure 1 for its location).  The tidal information is from the station S22G_T (on Figure 1).  The begin data is 10/1/2007 at 1:00 am and end date should be 6/12/2018 at 11:45 pm.
+
+XXX O2, B2  -  Sears, Saunders      G-860 This well is close to Miami (see Figure 1 for its location).  The tidal information is from the station S123_T (on Figure 1).  The begin data is 10/1/2007 at 1:00 am and end date should be 6/4/2018 at 12:30 pm.
+
+XXXO3, B3  -  TurnerM, Witebsky     G-580A This well is close to Miami (see Figure 1 for its location).  The tidal information is from the station S22_T (on Figure 1).  The begin data is 10/1/2007 at 12:00 am and end date should be 4/9/2018 at 11:00 am.
+
+XXXX O4, B4  -  Wynn, Luetkehoelter   F-319 This well is close to Miami (see Figure 1 for its location).  The tidal information is from the station Virginia Key (on Figure 1).  The begin data is 10/1/2007 at 1:00 am and end date should be 4/9/2018 at 12:00 pm.
+
+XXXX O5, B5  -  Bhat, Campbell      F-179 This well is close to Miami (see Figure 1 for its location).  The tidal information is from the station Virginia Key (on Figure 1).  The begin data is 10/1/2007 at 1:00 am and end date should be 6/4/2018 at 10:45 am.
+
+XXXX O6, B6  -  Baviskar, Petitjean   F-45 This well is close to Miami (see Figure 1 for its location).  The tidal information is from the station S27_T (on Figure 1).  The begin data is 10/1/2007 at 1:00 am and end date should be 3/26/2018 at 10:15 am.
+
+
+####################
+O7, B7, O3, B3, B11  Block, Powell, TurnerM, Witebsky, Liao     -  G-561 This well is north of Miami (see Figure 2 for its location).  The tidal information is from the station South Port Everglades (on Figure 2).  The begin data is 10/5/2007 at 12:00 am and end date should be 6/12/2018 at 11:45 pm.  The tide data for this well is in a separate file entitle Station 8722956.
+
+O8, B8, O4, B4,B12  Depolt, Haider, Wynn, Luetkehoelter, Pandey       -  G-2147 This well is north of Miami (see Figure 2 for its location).  The tidal information is from the station Hillsboro Inlet (on Figure 2).  The begin data is 10/10/2007 at 12:00 am and end date should be 6/8/2018 at 9:15 am.  The tide data for this well is in a separate file entitle Station 8722859.
+
+O9, B9, O5, B5  -  Wasielewski, Pamplin, Bhat, Campbell   G-2866 This well is north of Miami (see Figure 2 for its location).  The tidal information is from the station Hillsboro Inlet (on Figure 2).  The begin data is 10/1/2007 at 1:00 am and end date should be 6/8/2018 at 9:30 am.  The tide data for this well is in a separate file entitle Station 8722859.
+
+O10, B10, O6, B6  Haines, Dexter-Boone, Baviskar, Petitjean      -  G-1260 This well is north of Miami (see Figure 2 for its location).  The tidal information is from the station Lake Wyman (on Figure 2).  The begin data is 10/1/2007 at 1:00 am and end date should be 6/8/2018 at 11:45 am.  The tide data for this well is in a separate file entitle Station 8722802.
+
+XXXX O11, B11, B12  Walsh, Liao, Pandey    -  PB-1680 This well is north of Miami (see Figure 2 for its location).  The tidal information is from the station Lake Wyman (on Figure 2).  The begin data is 10/1/2007 at 1:00 am and end date should be 2/8/2018 at 9:15 am.  The tide data for this well is in a separate file entitle Station 8722802. TOO MANY MISSING VALUES.  NEED TO REASSIGN.
+
+
+XXX G-852 This well is close to Miami (see Figure 1 for its location).  The tidal information is from the station G58_H (on Figure 1).  The begin data is 10/1/2007 at 1:00 am and end date should be 4/9/2018 at 1:42 pm.
+
+
+
+XXXX G-1220 This well is north of Miami (see Figure 2 for its location).  The tidal information is from the station Fort Lauderdale Bahia Yacht Club
+ (on Figure 2).  The begin data is 10/1/2007 at 1:00 am and end date should be 4/21/2018 at 8:45 pm.  The tide data for this well is in a separate file entitle Station 8722939.  TOO MANY MISSING VALUES.
+
+
+
+
+
