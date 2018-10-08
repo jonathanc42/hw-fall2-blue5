@@ -58,3 +58,14 @@ data time.residualdata;
 	set testdata; 
 	if _n_ > 93622; 
 run; 
+
+data predictedvalue; 
+	set time.residualdata; 
+	yhat= Residual; 
+	yhatabs= abs(yhat)/_7_278;
+	ysum + yhatabs;
+run; 
+
+proc means data=predictedvalue;
+	var yhatabs; 
+run; 
