@@ -40,6 +40,8 @@ well_merge <- merge(time_seq, well_agg, by = "datetime", all.x=TRUE)
 
 #Find number of hourly entries with missing well data
 sum(is.na(well_merge$Corrected))
+summary(well_merge)
+head(well_merge)
 
 #Find which hourly entries are missing
 well_merge %>% filter(is.na(well_merge$Corrected))
