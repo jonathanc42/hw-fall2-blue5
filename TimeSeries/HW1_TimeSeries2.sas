@@ -52,3 +52,9 @@ proc arima data=Alldata plot=all;
 	forecast lead=168 back=168;
 run;
 quit;
+
+
+data time.residualdata;
+	set testdata; 
+	if _n_ > 93622; 
+run; 
