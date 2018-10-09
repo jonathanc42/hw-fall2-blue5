@@ -37,7 +37,6 @@ data<-read.transactions("DataMining/restaurantData_noside.csv",
                         format='single',
                         col=c('orderNumber','order'))
 
-
 #### assosiation analysis ####
 apriori(data)
 summary(data)
@@ -48,8 +47,6 @@ itemFrequencyPlot(data, support = 0.1)
 itemFrequencyPlot(data, topN = 20)
 image(data[1:100])
 
-rm(rules)
-#rules <- apriori(data)
 rules <- apriori(data, parameter = list(support = 0.001, confidence = 0.01,
                                         minlen = 2, maxlen = 2),
                  appearance = list(lhs=c('Filet Mignon','Pork Tenderloin','Roast Chicken','Duck'),
@@ -87,4 +84,12 @@ mrules <- apriori(meal,parameter = list(support = 0.001,
 inspect(sort(mrules, by = "lift")[1:5])
 inspect(sort(mrules, by = "support")[1:5])
 
-mrules
+#### Try not remove the sides but specify item name ####
+
+meatrules <- apriori(meal,parameter = list(support = 0.001,
+                                           confidence = 0.001,
+                                           minlen=2,maxlen=2),
+                     appearance = list(lhs=c('Filet Mignon','Pork Tenderloin','Roast Chicken','Duck'),
+                                       rhs=c('Blackstone Merlot','Cantina Pinot Bianco','Meiomi Pinot Noir','Duckhorn Chardonnay')))
+
+inspect(sort(meatrules, by = "lift"))
