@@ -1,11 +1,14 @@
 library(arules)
 library(dplyr)
 
+
+# remove the sides
 orderdata<-read.csv("DataMining/restaurantData.csv")
 orderdata <- orderdata %>%
   filter(type!='Side') %>%
   select(3,1)
-head(orderdata)
+
+# rewrite back to file
 write.csv(orderdata,"DataMining/restaurantData_noside.csv")
 
 #### load transaction data ####
