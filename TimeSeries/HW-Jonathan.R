@@ -1,6 +1,7 @@
 # Jonathan R homework
 
 #### Start ####
+library(haven)
 library(forecast)
 library(fma)
 library(tseries)
@@ -98,3 +99,17 @@ MAPE=mean(abs(error)/abs(test))
 #### Plot Forecase vs Actual ####
 plot(fcast$mean, ylim=c(7.5, 10.5), xlab="Hourly Data Over a Week", ylab="Water Depth", xaxt="n")
 lines(test, col="red")
+
+fcst <- read_sas('TimeSeries/Well Data/residualdata.sas7bdat')
+fcst$ACTUAL <- fcst$`_7_278`
+fcst$time <- seq(as.POSIXct("2018-06-06 01:00:00"), as.POSIXct("2018-06-13 00:00:00"), "hour")
+
+ggplot(fcst,aes(time)) +
+  geom_line(aes(y=FORECAST, col="Forecast")) +
+  geom_line(aes(y=ACTUAL, col='Actual')) +
+  ylab("Well Depth (m)") +
+  xlab("Observation Time") +
+  ggtitle("Actual vs. Forecast Well Depth") +
+  theme(legend.position="bottom") +
+  theme(legend.title=element_blank()) +
+  theme(plot.title = element_text(hjust = 0.5))
