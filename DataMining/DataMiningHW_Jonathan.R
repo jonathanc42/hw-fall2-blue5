@@ -81,8 +81,8 @@ mrules <- apriori(meal,parameter = list(support = 0.001,
                                         confidence = 0.001,
                                         minlen=3,maxlen=3),
                   appearance = list(rhs=c('Blackstone Merlot','Cantina Pinot Bianco','Meiomi Pinot Noir','Duckhorn Chardonnay')))
-inspect(sort(mrules, by = "lift")[1:5])
-inspect(sort(mrules, by = "support")[1:5])
+inspect(sort(mrules, by = "lift"))
+inspect(sort(mrules, by = "support"))
 
 #### Try not remove the sides but specify item name ####
 
@@ -93,3 +93,8 @@ meatrules <- apriori(meal,parameter = list(support = 0.001,
                                        rhs=c('Blackstone Merlot','Cantina Pinot Bianco','Meiomi Pinot Noir','Duckhorn Chardonnay')))
 
 inspect(sort(meatrules, by = "lift"))
+inspect(sort(meatrules, by = "count"))
+write.csv(inspect(sort(meatrules, by = "lift")),"DataMining/result.csv")
+
+
+all.equal(df3,df4)
