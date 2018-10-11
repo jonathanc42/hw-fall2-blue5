@@ -77,7 +77,8 @@ colSums(is.na(df))
 # Only need to impute for well_ft and rain_ft
 df <- df %>%
         mutate(well_ft = na.approx(well_ft, rule=2),
-               tide_ft = na.approx(tide_ft, rule=2))
+               tide_ft = na.approx(tide_ft, rule=2))%>% 
+  filter(datetime >'2016-01-01 0:00:00')
 
 colSums(is.na(df))
 
