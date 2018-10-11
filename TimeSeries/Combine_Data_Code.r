@@ -51,7 +51,7 @@ rain$datetime <- as.POSIXct(rain$datetime)  # change time type of newly created 
 #Aggregate hourly
 rain_agg <- rain %>%
               group_by(datetime) %>%
-              summarise(rain_ft = sum(RAIN_FT))
+              summarise(rain_in = sum(RAIN_FT*12))
 
 
 
@@ -86,3 +86,9 @@ colSums(is.na(df))
 ############################### Export to csv or SAS ########################################
 fwrite(df, '../Outputs/combined_well.csv')
 
+##############################Create text files to import into SAS###########################
+
+library(foreign)
+
+
+write.foreign(df, "C:/Users/senor/Documents/Time_Series/timeseries2_hw2.txt", "C:/Users/senor/Documents/Time_Series/timeseries2_hw2.sas", package = "SAS")
