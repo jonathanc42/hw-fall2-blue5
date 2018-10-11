@@ -1,3 +1,4 @@
+install.packages('arules')
 library(arules)
 library(dplyr)
 
@@ -74,9 +75,6 @@ meal<-read.transactions("DataMining/restaurantData.csv",
                         format='single',
                         col=c('orderNumber','order'))
 
-apriori(meal)
-
-rm(mrules)
 mrules <- apriori(meal,parameter = list(support = 0.001,
                                         confidence = 0.001,
                                         minlen=3,maxlen=3),
