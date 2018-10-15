@@ -110,7 +110,7 @@ fcst$time <- seq(as.POSIXct("2018-06-06 00:00:00"), as.POSIXct("2018-06-12 23:00
 ggplot(fcst,aes(time)) +
   geom_line(aes(y=FORECAST, col="Forecast")) +
   geom_line(aes(y=ACTUAL, col='Actual')) +
-  ylab("Well Depth (m)") +
+  ylab("Well Depth (ft)") +
   xlab("Observation Time") +
   ggtitle("Actual vs. Forecasted Well Depth") +
   theme(legend.position="bottom") +
