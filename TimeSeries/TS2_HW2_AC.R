@@ -78,14 +78,13 @@ df <- time_seq %>%
 # print missing values by column
 colSums(is.na(df))
 
-df_na <- df %>%
-  filter(datetime>'2015-10-01 0:00:00')
-colSums(is.na(df_na))
-
 # Only need to impute for well_ft and rain_ft
 df <- df %>%
   mutate(well_ft = na.approx(well_ft, rule=2),
          tide_ft = na.approx(tide_ft, rule=2)) 
+
+# Check for missing values
+colSums(is.na(df))
 
 # Only use data from 2016-2018
 df2 <- df %>%
@@ -93,8 +92,10 @@ df2 <- df %>%
          tide_ft = na.approx(tide_ft, rule=2)) %>%
   filter(datetime >'2016-10-01 0:00:00')
 
-# Check for missing values
-colSums(is.na(df))
+# Check for missing values in subsetted data
+df_na <- df %>%
+  filter(datetime>'2016-10-01 0:00:00')
+colSums(is.na(df_na))
 
 
 ############################### Export to csv or SAS ########################################
