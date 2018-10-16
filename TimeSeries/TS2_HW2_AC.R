@@ -87,7 +87,7 @@ df <- df %>%
 df2 <- df %>%
   mutate(well_ft = na.approx(well_ft, rule=2),
          tide_ft = na.approx(tide_ft, rule=2)) %>%
-  filter(datetime >'2012-06-01 0:00:00')
+  filter(datetime >'2016-10-01 0:00:00')
 
 # Check for missing values
 colSums(is.na(df))
@@ -165,16 +165,16 @@ Pacf(training_diff, lag=30)$acf
 #summary(arima.final)
 
 ## Final Arima model
-arima.final=Arima(Wellft,order=c(4,1,23), xreg=fourier(Wellft,K=12), fixed=c(NA,NA,NA,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA), method="ML")    # q=(1,5,23) and fourier
-arima.final=Arima(Wellft,order=c(4,1,5), xreg=fourier(Wellft,K=15), method="ML")    # fourier
-arima.final=Arima(Wellft,order=c(4,1,23), fixed=c(NA,NA,NA,NA,NA,0,0,0,0,NA,0,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,NA) , method="ML")    # q=(1,6,9,13,23)
+#arima.final=Arima(Wellft,order=c(4,1,23), xreg=fourier(Wellft,K=12), fixed=c(NA,NA,NA,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA), method="ML")    # q=(1,5,23) and fourier
+#arima.final=Arima(Wellft,order=c(4,1,5), xreg=fourier(Wellft,K=15), method="ML")    # fourier
+#arima.final=Arima(Wellft,order=c(4,1,23), fixed=c(NA,NA,NA,NA,NA,0,0,0,0,NA,0,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,NA) , method="ML")    # q=(1,6,9,13,23)
 
 ####-----------------------------------WELL FT/RAIN/TIDE: Arima Model ------------------------------------####
 
 ## Arima model with Rain and Tide
-x.reg=cbind(Rainin.v,Tideft.v)                   # try with Rain and Tide
+#x.reg=cbind(Rainin.v,Tideft.v)                   # try with Rain and Tide
 #x.reg=cbind(Rainin.v, fourier(Wellft,K=4))       # try with Rain and fourier transform
-#x.reg=cbind(Rainin.v)                             # try with Rain only
+x.reg=cbind(Rainin.v)                             # try with Rain only
 
 ## Check for differences
 model1=Arima(Wellft,order=c(2,0,0),xreg=x.reg, method="ML")
@@ -184,8 +184,8 @@ ndiffs(model1$residuals)
 #auto.arima(model1$residuals,seasonal=T)
 
 ## Final Arima model
-arima.final=Arima(Wellft,order=c(4,1,5), xreg=cbind(x.reg, fourier(Wellft,K=15)), method="ML")    # fourier
-arima.final=Arima(Wellft,order=c(4,0,23),xreg=x.reg, fixed=c(NA,NA,NA,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA), method="ML")    # q=(1,5,23) with rain
+#arima.final=Arima(Wellft,order=c(4,1,5), xreg=cbind(x.reg, fourier(Wellft,K=15)), method="ML")    # fourier
+arima.final=arima(Wellft,order=c(4,0,23),xreg=x.reg, fixed=c(NA,NA,NA,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA), method="ML")    # q=(1,5,23) with rain
 
 ####-------------------------------------Diagnostic Plots-------------------------------------####
 
@@ -217,8 +217,8 @@ abline(h = 0.05, lty = "dashed", col = "black")
 
 ## Forecast for Wellft on holdout data set
 #forecast.final=forecast(arima.final,xreg=newx,h=24*7)                   # Uses forecasted rain data
-forecast.final=forecast(arima.final,xreg=cbind(Rainin.test.v, Tideft.test.v),h=24*7)          # Uses actual rain/tide data
-forecast.final=forecast(arima.final,xreg=cbind(fourier(Wellft,K=15,h=24*7),Rainin.test.v,Tideft.test.v),h=24*7)     # Fourier, rain, and tide
+forecast.final=forecast(arima.final,xreg=Rainin.test.v,h=24*7)          # Uses actual rain data
+#forecast.final=forecast(arima.final,xreg=cbind(fourier(Wellft,K=15,h=24*7),Rainin.test.v,Tideft.test.v),h=24*7)     # Fourier, rain, and tide
 forecastdf<-data.frame(tail(welldf$datetime,n=24*7),round(forecast.final$mean,4),Wellft.test)
 names(forecastdf)[1]<-'date'
 names(forecastdf)[2]<-'forecast'
