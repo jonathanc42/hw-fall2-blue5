@@ -78,6 +78,10 @@ df <- time_seq %>%
 # print missing values by column
 colSums(is.na(df))
 
+df_na <- df %>%
+  filter(datetime>'2015-10-01 0:00:00')
+colSums(is.na(df_na))
+
 # Only need to impute for well_ft and rain_ft
 df <- df %>%
   mutate(well_ft = na.approx(well_ft, rule=2),
