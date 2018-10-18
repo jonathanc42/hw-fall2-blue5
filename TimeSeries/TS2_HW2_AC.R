@@ -16,14 +16,14 @@ library(caschrono)
 library(TSA)
 library(quantmod)
 
-setwd('/Users/anniecooper/Documents/MSA_2019/Time Series/')
+#setwd('/Users/anniecooper/Documents/MSA_2019/Time Series/')
 
 ####------------------------Clean the full (wellft/rain/tide) data set----------------------####
 
 ################################ Aggregate Well Data Hourly ###################################
 
 #Create Date Time Object
-well <- read_xlsx('Well Data/G-2866_T.xlsx', 'Well')
+well <- read_xlsx('TimeSeries/Well Data/G-2866_T.xlsx', 'Well')
 well <- mutate(well, datetime=date(date))  # adds date to datetime
 hour(well$datetime) <- hour(well$time) # Adds hour to datetime. Removes minutes from all hours
 well$datetime <- as.POSIXct(well$datetime, tz='EST')  # change time type of newly created Datetime
@@ -36,7 +36,7 @@ well_agg <- well %>%    # summarizes to hourly data and
 ################################ Aggregate Tide Data Hourly ###################################
 
 #Create datetime column
-tide <- fread('Well Data/station_8722859.csv')
+tide <- fread('TimeSeries/Well Data/station_8722859.csv')
 tide <- mutate(tide, 
                Time = paste(Date, Time),
                datetime=date(Date))  # adds date to datetime
@@ -51,7 +51,7 @@ tide_agg <- tide %>%
 ################################ Aggregate Rain Data Hourly ###################################
 
 #Create datetime column
-rain <- read_xlsx('Well Data/G-2866_T.xlsx', 'Rain')
+rain <- read_xlsx('TimeSeries/Well Data/G-2866_T.xlsx', 'Rain')
 rain <- mutate(rain, datetime=date(Date))
 hour(rain$datetime) <- hour(rain$Date) # adds date to datetime
 rain$datetime <- as.POSIXct(rain$datetime, tz='EST')  # change time type of newly created Datetime
