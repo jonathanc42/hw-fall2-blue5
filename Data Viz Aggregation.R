@@ -91,7 +91,7 @@ df_G_2866$Well = "G-2866"
 
 #Create Date Time Object for Well F-45
 F_45_well <- read_xlsx('F-45.xlsx', 'Well')
-F_45_well <- mutate(F_45, datetime=date(date))  # adds date to datetime
+F_45_well <- mutate(F_45_well, datetime=date(date))  # adds date to datetime
 hour(F_45_well$datetime) <- hour(F_45_well$time) # Adds hour to datetime. Removes minutes from all hours
 F_45_well$datetime <- as.POSIXct(F_45_well$datetime)  # change time type of newly created Datetime
 
@@ -268,11 +268,11 @@ F_319_well_agg <- F_319_well %>%    # summarizes to hourly data and
 #Create datetime column
 F_319_rain <- read_xlsx('F-319.xlsx', 'Rain')
 F_319_rain <- mutate(F_319_rain, datetime=date(Date))
-hour(rain$datetime) <- hour(F_319_rain$Date) # adds date to datetime
+hour(F_319_rain$datetime) <- hour(F_319_rain$Date) # adds date to datetime
 F_319_rain$datetime <- as.POSIXct(F_319_rain$datetime)  # change time type of newly created Datetime
 
 #Aggregate hourly
-F_319_rain_agg <- rain %>%
+F_319_rain_agg <- F_319_rain %>%
   group_by(datetime) %>%
   summarise(rain_in = sum(RAIN_FT*12))
 
@@ -492,7 +492,7 @@ hour(G_852_rain$datetime) <- hour(G_852_rain$Date) # adds date to datetime
 G_852_rain$datetime <- as.POSIXct(G_852_rain$datetime)  # change time type of newly created Datetime
 
 #Aggregate hourly
-G_852_rain_agg <- rain %>%
+G_852_rain_agg <- G_852_rain %>%
   group_by(datetime) %>%
   summarise(rain_in = sum(RAIN_FT*12))
 
@@ -560,7 +560,7 @@ G_860_well_agg <- G_860_well %>%    # summarizes to hourly data and
 
 #Create datetime column
 G_860_rain <- read_xlsx('G-860.xlsx', 'Rain')
-G_860_rain <- mutate(rain, datetime=date(Date))
+G_860_rain <- mutate(G_860_rain, datetime=date(Date))
 hour(G_860_rain$datetime) <- hour(G_860_rain$Date) # adds date to datetime
 G_860_rain$datetime <- as.POSIXct(G_860_rain$datetime)  # change time type of newly created Datetime
 
@@ -979,15 +979,4 @@ df_PB_1680$Well = "PB-1680"
 
 Well_merge = Reduce(function(x, y) merge(x, y, all=TRUE), list(df_F_45, df_F_179, df_F_319, df_G_561, df_G_580A, df_G_852, df_G_860, df_G_1220, df_G_1260, df_G_2147, df_G_2866, df_G_3549, df_PB_1680))
 
-sum(is.na(Well_merge$tide_ft))
-
-############################### Export to csv or SAS ########################################
-fwrite(df, '../Outputs/combined_well.csv')
-
-##############################Create text files to import into SAS###########################
-
-library(foreign)
-
-
-#write.foreign(df, "C:/Users/senor/Documents/Time_Series/timeseries2_hw2.txt", "C:/Users/senor/Documents/Time_Series/timeseries2_hw2.sas", package = "SAS")
-
+Well_merge = Well_merge %>% filter(Well_merge$datetime > "2014-01-01 00:00:00")
