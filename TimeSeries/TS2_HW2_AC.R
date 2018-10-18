@@ -23,10 +23,10 @@ setwd('/Users/anniecooper/Documents/MSA_2019/Time Series/')
 ################################ Aggregate Well Data Hourly ###################################
 
 #Create Date Time Object
-well <- read_xlsx('G-2866_T.xlsx', 'Well')
+well <- read_xlsx('Well Data/G-2866_T.xlsx', 'Well')
 well <- mutate(well, datetime=date(date))  # adds date to datetime
 hour(well$datetime) <- hour(well$time) # Adds hour to datetime. Removes minutes from all hours
-well$datetime <- as.POSIXct(well$datetime)  # change time type of newly created Datetime
+well$datetime <- as.POSIXct(well$datetime, tz='EST')  # change time type of newly created Datetime
 
 #Aggregate Well Data by hour
 well_agg <- well %>%    # summarizes to hourly data and  
@@ -36,12 +36,12 @@ well_agg <- well %>%    # summarizes to hourly data and
 ################################ Aggregate Tide Data Hourly ###################################
 
 #Create datetime column
-tide <- fread('station_8722859.csv')
+tide <- fread('Well Data/station_8722859.csv')
 tide <- mutate(tide, 
                Time = paste(Date, Time),
                datetime=date(Date))  # adds date to datetime
 hour(tide$datetime) <- hour(tide$Time)  # Adds hour to datetime. Removes minutes from all hours
-tide$datetime <- as.POSIXct(tide$datetime)  # change time type of newly created Datetime
+tide$datetime <- as.POSIXct(tide$datetime, tz='EST')  # change time type of newly created Datetime
 
 #Aggregate hourly
 tide_agg <- tide %>%
@@ -51,10 +51,10 @@ tide_agg <- tide %>%
 ################################ Aggregate Rain Data Hourly ###################################
 
 #Create datetime column
-rain <- read_xlsx('G-2866_T.xlsx', 'Rain')
+rain <- read_xlsx('Well Data/G-2866_T.xlsx', 'Rain')
 rain <- mutate(rain, datetime=date(Date))
 hour(rain$datetime) <- hour(rain$Date) # adds date to datetime
-rain$datetime <- as.POSIXct(rain$datetime)  # change time type of newly created Datetime
+rain$datetime <- as.POSIXct(rain$datetime, tz='EST')  # change time type of newly created Datetime
 
 #Aggregate hourly
 rain_agg <- rain %>%
@@ -64,15 +64,15 @@ rain_agg <- rain %>%
 ############################### Merge all data ############################################
 
 # create full sequence of dates
-time_seq <- as.data.frame(seq(as.POSIXct("2007-10-01 01:00:00"), as.POSIXct("2018-06-12 23:00:00"), "hour"))
+time_seq <- as.data.frame(seq(as.POSIXct("2007-10-01 01:00:00", tz='EST'), as.POSIXct("2018-06-12 23:00:00", tz='EST'), "hour"))
 names(time_seq) <- c("datetime")
-
+View(time_seq)
 #Merge Left Outer join of time sequence on well data
 df <- time_seq %>%
   left_join(well_agg, by='datetime') %>%
   left_join(rain_agg, by='datetime') %>%
   left_join(tide_agg, by='datetime')
-
+View(df)
 ############################### Impute Missing Values ####################################
 
 # print missing values by column
@@ -86,22 +86,25 @@ df <- df %>%
 # Check for missing values
 colSums(is.na(df))
 
-# Only use data from 2016-2018
+# Only use data from 2014-2018
 df2 <- df %>%
   mutate(well_ft = na.approx(well_ft, rule=2),
          tide_ft = na.approx(tide_ft, rule=2)) %>%
-  filter(datetime >'2016-10-01 0:00:00')
+  filter(datetime >'2016-10-01 0:00:00' & datetime < '2018-06-08 09:00:00')
 
 # Check for missing values in subsetted data
 df_na <- df %>%
-  filter(datetime>'2016-10-01 0:00:00')
+  filter(datetime > '2016-10-01 00:00:00' & datetime < '2018-06-08 11:00:00')
 colSums(is.na(df_na))
-
+View(df_na)
+View(df)
 
 ############################### Export to csv or SAS ########################################
 
-#fwrite(df, 'combined_well.csv')
-#write_sas(df,'combined_well.sas7bdat')
+#write.csv(df2, 'combined_well.csv')
+#write_sas(df2,'combined_well.sas7bdat')
+#library(foreign)
+#write.foreign(df2, "combined_well.txt", "combined_well.sas7bdat", package = "SAS")
 
 ####-----------------------------Prepare data, ts object, and training/test sets--------------------------------####
 
@@ -114,7 +117,7 @@ colSums(is.na(df_na))
 ## Rename the dataframe to use for time series
 #welldf <- df         # full data set
 welldf <- df2         # subsetted data set
-#View(welldf)
+View(welldf)
 
 ## Create Time Series Data Object
 wellts <- ts(welldf,frequency =365.25*24)
@@ -145,14 +148,14 @@ decomp_wellft <- stl(Wellft, s.window=7)
 plot(decomp_wellft)
 
 ## Sines & Cosines
-arima.s<-Arima(Wellft,xreg=fourier(Wellft,K=12))
+#arima.s<-Arima(Wellft,xreg=fourier(Wellft,K=12))
 
 ## Test for Differences in residuals: number of differences required for a stationary series
-plot(arima.s$residuals)
-ndiffs(arima.s$residuals)
-training_diff<-diff(Wellft, lag=1)
-ndiffs(training_diff)
-plot(training_diff)
+#plot(arima.s$residuals)
+#ndiffs(arima.s$residuals)
+#training_diff<-diff(Wellft, lag=1)
+#ndiffs(training_diff)
+#plot(training_diff)
 
 ## Augmented Dickey-Fuller Test: test for trend
 #adf.test(training_diff, alternative = "stationary", k = 0)
@@ -160,8 +163,8 @@ plot(training_diff)
 #adf.test(training_diff, alternative = "stationary", k = 2)
 
 ## Acf/Pacf plots
-Acf(training_diff, lag=30)$acf
-Pacf(training_diff, lag=30)$acf
+#Acf(training_diff, lag=30)$acf
+#Pacf(training_diff, lag=30)$acf
 
 ####-----------------------------------WELL FT ONLY: Arima Model ------------------------------------####
 
@@ -171,7 +174,7 @@ Pacf(training_diff, lag=30)$acf
 
 ## Final Arima model
 #arima.final=Arima(Wellft,order=c(4,1,23), xreg=fourier(Wellft,K=12), fixed=c(NA,NA,NA,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA), method="ML")    # q=(1,5,23) and fourier
-#arima.final=Arima(Wellft,order=c(4,1,5), xreg=fourier(Wellft,K=15), method="ML")    # fourier
+arima.final=Arima(Wellft,order=c(4,1,5), xreg=fourier(Wellft,K=15), method="ML")    # fourier
 #arima.final=Arima(Wellft,order=c(4,1,23), fixed=c(NA,NA,NA,NA,NA,0,0,0,0,NA,0,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,NA) , method="ML")    # q=(1,6,9,13,23)
 
 ####-----------------------------------WELL FT/RAIN/TIDE: Arima Model ------------------------------------####
@@ -184,6 +187,7 @@ x.reg=cbind(Rainin.v)                             # try with Rain only
 ## Check for differences
 model1=Arima(Wellft,order=c(2,0,0),xreg=x.reg, method="ML")
 ndiffs(model1$residuals)
+plot(model1$residuals)
 
 ## Auto Arima with Rain and Tide
 #auto.arima(model1$residuals,seasonal=T)
@@ -191,11 +195,15 @@ ndiffs(model1$residuals)
 ## Final Arima model
 #arima.final=Arima(Wellft,order=c(4,1,5), xreg=cbind(x.reg, fourier(Wellft,K=15)), method="ML")    # fourier
 arima.final=arima(Wellft,order=c(4,0,23),xreg=x.reg, fixed=c(NA,NA,NA,NA,NA,0,0,0,NA,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NA,NA,NA), method="ML")    # q=(1,5,23) with rain
+#arima.final=arima(Wellft,order=c(4,1,23),xreg=x.reg,method="ML")    # q=(1,5,23) with rain
 
 ####-------------------------------------Diagnostic Plots-------------------------------------####
 
-## Updated Acf/Pacf plots
+## Check stationarity
 plot(arima.final$residuals)
+ndiffs(model1$residuals)
+
+## Updated Acf/Pacf plots
 Acf(arima.final$residuals, lag=25)$acf
 Pacf(arima.final$residuals, lag=25)$acf
 
@@ -223,7 +231,7 @@ abline(h = 0.05, lty = "dashed", col = "black")
 ## Forecast for Wellft on holdout data set
 #forecast.final=forecast(arima.final,xreg=newx,h=24*7)                   # Uses forecasted rain data
 forecast.final=forecast(arima.final,xreg=Rainin.test.v,h=24*7)          # Uses actual rain data
-#forecast.final=forecast(arima.final,xreg=cbind(fourier(Wellft,K=15,h=24*7),Rainin.test.v,Tideft.test.v),h=24*7)     # Fourier, rain, and tide
+#forecast.final=forecast(arima.final,xreg=fourier(Wellft,K=15,h=24*7),h=24*7)     # Fourier
 forecastdf<-data.frame(tail(welldf$datetime,n=24*7),round(forecast.final$mean,4),Wellft.test)
 names(forecastdf)[1]<-'date'
 names(forecastdf)[2]<-'forecast'
