@@ -112,7 +112,7 @@ F_45_tide$datetime <- as.POSIXct(F_45_tide$datetime)
 
 
 #Aggregate hourly
-F_45_tide_agg <- tide %>%
+F_45_tide_agg <- F_45_tide %>%
   group_by(datetime) %>%
   summarise(tide_ft = mean(Tide_ft))
 
@@ -179,7 +179,7 @@ F_179_well_agg <- F_179_well %>%    # summarizes to hourly data and
 #Create datetime column
 F_179_tide <- read_xlsx('F-179.xlsx', 'Tide')
 F_179_tide <- mutate(F_179_tide, datetime=date(Date))  # adds date to datetime
-hour(tide$datetime) <- hour(F_179_tide$Time) # Adds hour to datetime. Removes minutes from all hours
+hour(F_179_tide$datetime) <- hour(F_179_tide$Time) # Adds hour to datetime. Removes minutes from all hours
 F_179_tide$datetime <- as.POSIXct(F_179_tide$datetime)  # change time type of newly created Datetime
 
 # #Aggregate hourly
@@ -226,7 +226,7 @@ colSums(is.na(df_F_179))
 
 # Only need to impute for well_ft and tide_ft
 df_F_179 <- df_F_179 %>%
-  mutate(well_ft = na.approx(well_ft, rule=2))
+  mutate(well_ft = na.approx(well_ft, rule=2),
          tide_ft = na.approx(tide_ft, rule=2))
 
 colSums(is.na(df_F_179))
@@ -250,12 +250,12 @@ F_319_well_agg <- F_319_well %>%    # summarizes to hourly data and
 
 #Create datetime column
 F_319_tide <- read_xlsx('F-319.xlsx', 'Tide')
-F_319_tide <- mutate(F_139_tide, datetime=date(Date))  # adds date to datetime
-hour(F_139_tide$datetime) <- hour(F_139_tide$Time) # Adds hour to datetime. Removes minutes from all hours
-F_139_tide$datetime <- as.POSIXct(F_139_tide$datetime)  # change time type of newly created Datetime
+F_319_tide <- mutate(F_319_tide, datetime=date(Date))  # adds date to datetime
+hour(F_319_tide$datetime) <- hour(F_319_tide$Time) # Adds hour to datetime. Removes minutes from all hours
+F_319_tide$datetime <- as.POSIXct(F_319_tide$datetime)  # change time type of newly created Datetime
 
 #Aggregate hourly
-F_319_tide_agg <- F_139_tide %>%
+F_319_tide_agg <- F_319_tide %>%
   group_by(datetime) %>%
   summarise(tide_ft = mean(Tide_ft))
 
@@ -543,9 +543,9 @@ G_860_well_agg <- G_860_well %>%    # summarizes to hourly data and
 
 #Create datetime column
 G_860_tide <- read_xlsx('G-860.xlsx', 'Tide')
-G_860_tide <- mutate(tide, datetime=date(Date))  # adds date to datetime
+G_860_tide <- mutate(G_860_tide, datetime=date(Date))  # adds date to datetime
 hour(G_860_tide$datetime) <- hour(G_860_tide$Time) # Adds hour to datetime. Removes minutes from all hours
-G_860_tide$datetime <- as.POSIXct(G_860tide$datetime)  # change time type of newly created Datetime
+G_860_tide$datetime <- as.POSIXct(G_860_tide$datetime)  # change time type of newly created Datetime
 
 #Aggregate hourly
 G_860_tide_agg <- G_860_tide %>%
@@ -615,7 +615,7 @@ G_1220_well_agg <- G_1220_well %>%    # summarizes to hourly data and
 ## Aggregate Tide Data Hourly ##
 
 #Create datetime column
-tide <- fread('station_822956.csv')
+tide <- fread('station_8722956.csv')
 tide <- mutate(tide,
                Time = paste(Date, Time),
                datetime=date(Date))  # adds date to datetime
@@ -675,7 +675,6 @@ df_G_1220$Well = "G-1220"
 ################################# Well G-1260 ###################################
 
 
-##FOLLOW UP ON TIDE DATA, EXTERNAL FILE HAS NO VALUES##
 G_1260_well <- read_xlsx('G-1260_T.xlsx', 'Well')
 G_1260_well <- mutate(G_1260_well, datetime=date(date))  # adds date to datetime
 hour(G_1260_well$datetime) <- hour(G_1260_well$time) # Adds hour to datetime. Removes minutes from all hours
@@ -691,7 +690,7 @@ G_1260_well_agg <- G_1260_well %>%    # summarizes to hourly data and
 ## Aggregate Tide Data Hourly ##
 
 #Create datetime column
-G_126_tide <- fread('station_8722802.csv')
+G_1260_tide <- fread('station_8722802.csv')
 G_1260_tide <- mutate(G_1260_tide,
                Time = paste(Date, Time),
                datetime=date(Date))  # adds date to datetime
@@ -727,10 +726,12 @@ G_1260_rain_agg <- G_1260_rain %>%
 time_seq <- as.data.frame(seq(as.POSIXct("2007-10-01 01:00:00"), as.POSIXct("2018-06-08 11:00:00"), "hour"))
 names(time_seq) <- c("datetime")
 
+
+
 #Merge Left Outer join of time sequence on well data
 df_G_1260 <- time_seq %>%
   left_join(G_1260_well_agg, by='datetime') %>%
-  #left_join(G_1260_tide_agg, by='datetime') %>%
+  left_join(G_1260_tide_agg, by='datetime') %>%
   left_join(G_1260_rain_agg, by='datetime')
 
 
@@ -752,7 +753,7 @@ df_G_1260$Well = "G-1260"
 ################################# Well G-2147 ###################################
 
 
-##FOLLOW UP ON TIDE DATA, EXTERNAL FILE HAS NO VALUES##
+
 G_2147_well <- read_xlsx('G-2147_T.xlsx', 'Well')
 G_2147_well <- mutate(G_2147_well, datetime=date(date))  # adds date to datetime
 hour(G_2147_well$datetime) <- hour(G_2147_well$time) # Adds hour to datetime. Removes minutes from all hours
@@ -769,7 +770,7 @@ G_2147_well_agg <- G_2147_well %>%    # summarizes to hourly data and
 
 #Create datetime column
 G_2147_tide <- fread('station_8722859.csv')
-G_1247_tide <- mutate(G_1247_tide,
+G_2147_tide <- mutate(G_2147_tide,
                Time = paste(Date, Time),
                datetime=date(Date))  # adds date to datetime
 hour(G_2147_tide$datetime) <- hour(G_2147_tide$Time)  # Adds hour to datetime. Removes minutes from all hours
@@ -986,33 +987,33 @@ Well_merge = Well_merge %>% filter(Well_merge$datetime > "2014-01-01 00:00:00")
 # 
 # ##############################Create text files to import into SAS###########################
 # 
-library(foreign)
-
-
-write.foreign(Well_merge, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\Well_Merge.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\Well_Merge.sas", package = "SAS")
-
-write.foreign(df_F_45, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-45.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-45.sas", package = "SAS")
-
-write.foreign(df_F_179, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-179.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-179.sas", package = "SAS")
-
-write.foreign(df_F_319, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-319.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-319.sas", package = "SAS")
-
-write.foreign(df_G_561, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-561.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-561.sas", package = "SAS")
-
-write.foreign(df_G_580A, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-580A.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-580A.sas", package = "SAS")
-
-write.foreign(df_G_852, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-852.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-852.sas", package = "SAS")
-
-write.foreign(df_G_860, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-860.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-860.sas", package = "SAS")
-
-write.foreign(df_G_1220, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1220.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1220.sas", package = "SAS")
-
-write.foreign(df_G_1260, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1260.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1260.sas", package = "SAS")
-
-write.foreign(df_G_2147, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2147.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2147.sas", package = "SAS")
-
-write.foreign(df_G_2866, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2866.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2866.sas", package = "SAS")
-
-write.foreign(df_G_3549, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-3549.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-3649.sas", package = "SAS")
-
-write.foreign(df_PB_1680, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\PB-1680.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\PB-1680.sas", package = "SAS")
+# library(foreign)
+# 
+# 
+# write.foreign(Well_merge, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\Well_Merge.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\Well_Merge.sas", package = "SAS")
+# 
+# write.foreign(df_F_45, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-45.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-45.sas", package = "SAS")
+# 
+# write.foreign(df_F_179, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-179.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-179.sas", package = "SAS")
+# 
+# write.foreign(df_F_319, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-319.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\F-319.sas", package = "SAS")
+# 
+# write.foreign(df_G_561, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-561.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-561.sas", package = "SAS")
+# 
+# write.foreign(df_G_580A, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-580A.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-580A.sas", package = "SAS")
+# 
+# write.foreign(df_G_852, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-852.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-852.sas", package = "SAS")
+# 
+# write.foreign(df_G_860, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-860.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-860.sas", package = "SAS")
+# 
+# write.foreign(df_G_1220, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1220.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1220.sas", package = "SAS")
+# 
+# write.foreign(df_G_1260, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1260.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-1260.sas", package = "SAS")
+# 
+# write.foreign(df_G_2147, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2147.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2147.sas", package = "SAS")
+# 
+# write.foreign(df_G_2866, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2866.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-2866.sas", package = "SAS")
+# 
+# write.foreign(df_G_3549, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-3549.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\G-3649.sas", package = "SAS")
+# 
+# write.foreign(df_PB_1680, "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\PB-1680.txt", "C:\\Users\\aalmq\\OneDrive\\Documents\\Data Visualization\\PB-1680.sas", package = "SAS")
