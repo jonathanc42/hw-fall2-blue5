@@ -1,0 +1,35 @@
+Goal:
+Predict if the client will subscribe (yes/no) to FFT processing (variable y).
+
+Attribute Information:
+I
+Variables regarding bank client data:
+1 - age (numeric)
+2 - job : type of job (categorical: 'admin.','blue-collar','entrepreneur','housemaid','management','retired','self-employed','services','student','technician','unemployed','unknown')
+3 - consumerGroup : Customer Segment (categorical: 'A' 'B' 'C' 'D') references 2012 sales segmentation (or predicted segmentation) based on availability of externally purchased marketing data
+4 - education (categorical: 'basic.4y','basic.6y','basic.9y','high.school','illiterate','professional.course','university.degree','unknown')
+5 - default: has credit currently in default? (categorical: 'no','yes','unknown')
+6 - mortgage: has housing loan? (categorical: 'no','yes','unknown')
+7 - loan: has personal loan? (categorical: 'no','yes','unknown')
+8 - val_email: a valid/verified email on file for client (‘yes’,’no’)
+
+-balance:  primary investment account balance prior to beginning of marketing campaign
+
+Variables related with the last contact of the current campaign:
+9 - phone_type: phone contact communication type (categorical: 'cellular','telephone') 
+10 - month: last contact month of year (categorical: 'jan', 'feb', 'mar', ..., 'nov', 'dec')
+11 - day_of_week: last contact day of the week (categorical: 'mon','tue','wed','thu','fri')
+
+Other attributes:
+13 - contacts: number of contacts performed during this campaign and for this client (numeric, includes last contact)
+14 - days_since: number of days that passed by after the client was last contacted from a previous campaign (numeric; -1 means client was not previously contacted)
+15 - total_contacts: number of contacts performed before this campaign and for this client (numeric)
+16 - last_campaign_outcome: outcome of the previous marketing campaign (categorical: 'failure','nonexistent','success')
+
+Output variable (desired target):
+21 - y - has the client subscribed to FFT? (binary: 'yes','no')
+
+
+
+
+
