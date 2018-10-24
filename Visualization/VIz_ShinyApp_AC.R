@@ -27,10 +27,6 @@ setwd('~/Documents/GitHub/hw-fall2-blue5/Visualization/')
 well_df <- read.csv('combined_well_hourly_2014.csv')
 well_df$datetime <- as.POSIXct(well_df$datetime, tz='EST')
 
-# Google Maps API
-key<-"AIzaSyCO6-3LMyCmInqpT7tGTjVVxz4dQcwe9h4"
-register_google(key = key)
-
 # well locations
 well_loc <- read.csv('Well_Coordinates.csv',sep='')
 states <- map_data( "state" )
@@ -40,11 +36,10 @@ data <- well_df %>%
   summarise(avg_well_ft=mean(well_ft), sum_rain_in=sum(rain_in), avg_tide_ft=mean(tide_ft))
 points <- merge( coords, data, by.x = 'Well', by.y = 'Well' )
 
-
 ####-----------------------UI---------------------------####
 
+# Side Panel Function
 specialSide <- function() {
-  # ns <- NS(id)
   column(4,
   inputPanel(
     selectInput("wellInput", "Well:",
@@ -67,7 +62,8 @@ specialSide <- function() {
 
 # Define UI 
 ui<-(fluidPage(theme = shinytheme("cerulean"),
-  #shinythemes::themeSelector(), 
+  # shinythemes::themeSelector(), 
+  # Custom CSS styling
   tags$style(HTML("
                   body {
                     background-color: rgba(	211,211,211,0.7);
@@ -120,16 +116,14 @@ ui<-(fluidPage(theme = shinytheme("cerulean"),
                   }
                   ")),
   
-  # Title
-  # headerPanel("VizuWell: Visualizing Well Volume"),
-
-  
+  # Panels on Main Page
   navbarPage(title="VizuWell: Visualizing Well Volume",
              tabPanel("Arima Forecast", 
                         fluidRow(
                           specialSide(),
                           column(8, 
-                            plotlyOutput("forecastPlot"),div(tableOutput("diagnosticTable"), style = "font-size:125%")
+                            plotlyOutput("forecastPlot"),div(tableOutput("diagnosticTable"), style = "font-size:125%"),
+                            HTML('<p><img src="https://s3.amazonaws.com/saltbox.solutions/cdn/annie/logo2.png", height="10%", width="10%", align="right"/></p>')
                           )
                         )
                       ),
@@ -145,21 +139,21 @@ ui<-(fluidPage(theme = shinytheme("cerulean"),
                       )
              )
   )
+
 ))
 
 
 #####----------------------SERVER-------------------------####
 
 # Define server logic
-
 server<-(function(input, output) {
   
-  #Filter the data based on date and well section
+  # Filter the data based on date and well section
   filtered_data <- reactive({
     well_df %>% filter(datetime >= input$dateInput[1] & datetime <= input$dateInput[2], Well==input$wellInput)
   })
   
-  #Create time series object: training and test
+  # Create time series objects, forecast, diagnostic calcs, summary stats
   well <- reactive({
     well_ts<-ts(filtered_data()$well_ft,frequency =365.25*24)
     fcast=input$fcastInput*24
@@ -195,16 +189,19 @@ server<-(function(input, output) {
     return(list(well_ts=well_ts, arima=arima, forecastdf=forecastdf, diagdf=diagdf, mapdf=mapdf, locdf=locdf))
   })
   
-  
+  # Plot Time Series with Forecast
   output$forecastPlot <- renderPlotly({
     p<-ggplot(data = filtered_data(), aes(x = datetime)) +
       geom_line(data=filtered_data(), aes(y = well_ft, colour='Actual Well Depth'), size = 1) +
       geom_line(data=well()$forecastdf, aes(y = well_ft, colour='Forecasted Well Depth'), size = 1) +
-      {if((length(input$measureInput)==1 && input$measureInput=='Rain Amount'))geom_line(data=filtered_data(), aes(y = rain_in, colour='Rain (in)'), size = 1)} +
-      {if((length(input$measureInput)==1 && input$measureInput=='Tide'))geom_line(data=filtered_data(), aes(y = tide_ft, colour='Tide (ft)'), size = 1)} +
-      {if(length(input$measureInput)==2)geom_line(data=filtered_data(), aes(y = rain_in, colour='Rain (in)'), size = 1)} +
-      {if(length(input$measureInput)==2)geom_line(data=filtered_data(), aes(y = tide_ft, colour='Tide (ft)'), size = 1)} +
-      scale_colour_manual("",breaks = c("Actual Well Depth","Forecasted Well Depth"),values = c('#00b0ff',"orange")) +
+      {if((length(input$measureInput)==1 && input$measureInput=='Rain Amount'))geom_line(data=filtered_data(), aes(y = rain_in, colour='Rain (in)'), size = .4)} +
+      {if((length(input$measureInput)==1 && input$measureInput=='Tide'))geom_line(data=filtered_data(), aes(y = tide_ft, colour='Tide (ft)'), size = .2)} +
+      {if(length(input$measureInput)==2)geom_line(data=filtered_data(), aes(y = rain_in, colour='Rain (in)'), size = .4)} +
+      {if(length(input$measureInput)==2)geom_line(data=filtered_data(), aes(y = tide_ft, colour='Tide (ft)'), size = .2)} +
+      {if((length(input$measureInput)==1 && input$measureInput=='Rain Amount'))  scale_colour_manual("",breaks = c("Actual Well Depth","Forecasted Well Depth","Rain Amount"),values = c('#00b0ff',"orange","purple"))} +
+      {if((length(input$measureInput)==1 && input$measureInput=='Tide')) scale_colour_manual("",breaks = c("Actual Well Depth","Forecasted Well Depth", "Tide"),values = c('#00b0ff',"orange","grey"))} +
+      {if(length(input$measureInput)==2) scale_colour_manual("",breaks = c("Actual Well Depth","Forecasted Well Depth","Rain Amount", "Tide"),values = c('#00b0ff',"orange","purple","grey")) } +
+      {if(length(input$measureInput)==0) scale_colour_manual("",breaks = c("Actual Well Depth","Forecasted Well Depth"),values = c('#00b0ff',"orange"))} +
       geom_ribbon(data=well()$forecastdf, aes(ymin = lo95, ymax = hi95), alpha = .25) +
       scale_y_continuous(name='Well Depth (ft)') +
       xlab("Date") +
@@ -231,13 +228,14 @@ server<-(function(input, output) {
           b=5,
           l=5)
       )
-    
   })
 
+  # Diagnostic Table with MAPE and AR terms
   output$diagnosticTable = renderTable({
     well()$diagdf
   })
   
+  # Residual Plot
   output$resPlot <- renderPlot({
     plot(well()$arima$residuals, 
          main=paste('Well:', input$wellInput, 'Residual Stationarity Plot'),
@@ -245,11 +243,13 @@ server<-(function(input, output) {
          ylab="Residuals")
   })
 
+  # ACF Plot
   output$acfPlot <- renderPlot({
     plot(Acf(well()$arima$residuals, lag=25),
          main=paste('Well:', input$wellInput,'ACF Plot'))
   })
   
+  # Map
   output$mymap <- renderLeaflet({
     m<-leaflet() %>%
       addTiles() %>%
@@ -262,7 +262,7 @@ server<-(function(input, output) {
                              "Tide (ft): ", round(well()$mapdf$Tide,2)))
     m
   })
-  
+
   
 })
 
